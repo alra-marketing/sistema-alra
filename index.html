@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 /* Layout: tema claro único (decisão de marca: clean, sem modo escuro); menu lateral branco + área off-white; magenta só em ação, seleção e alerta */
 :root{
@@ -698,6 +699,142 @@ textarea:disabled,.inp:disabled{background:var(--surface);opacity:1;border-color
 .cm-tr{cursor:pointer}.cm-tr:hover td{background:var(--surface)}
 .cm-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}@media (max-width:520px){.cm-opts{grid-template-columns:minmax(0,1fr)}}
 .cm-opts label{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:13px;font-weight:600;cursor:pointer}
+/* ===== Mapa de processos (moodboard interno), isolado em .mp ===== */
+.mp{--bg:#f7f5f6;--surface:#ffffff;--ink:#1c1519;--muted:#675d63;--line:#e5dbe1;--accent:#d4007a;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;--body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --c-atend:#d4007a;--c-plan:#7a4cc2;--c-traf:#c2410c;--c-social:#0f8a6a;--c-cria:#0e7490;--c-av:#b8860b;--c-ti:#475569;--dim:.18;
+  background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;border-radius:16px;
+  max-width:1280px;margin:0 auto;padding:28px 20px 48px;display:grid;gap:22px}
+:root[data-theme="dark"] .mp{--bg:#141013;--surface:#1e181c;--ink:#f1eaee;--muted:#a8999f;--line:#3a2f36;--accent:#ff4fb0;
+  --c-atend:#ff4fb0;--c-plan:#b28cf0;--c-traf:#fb8b4f;--c-social:#3fc9a0;--c-cria:#22b8cf;--c-av:#e3b341;--c-ti:#94a3b8}
+.mp *{box-sizing:border-box}
+.mp .mp-head{display:grid;gap:6px}
+.mp h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,3.4vw,36px);line-height:1.1;margin:0;text-wrap:balance;letter-spacing:-.01em;color:var(--ink)}
+.mp .sub{color:var(--muted);max-width:68ch;margin:0}
+.mp-stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.mp-stat{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.mp-stat b{color:var(--ink)}
+.mp-toolbar{display:grid;gap:12px}
+.mp-label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.mp-people{display:flex;flex-wrap:wrap;gap:8px}
+.mp-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px 5px 5px;font:inherit;font-size:14px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.mp-chip:hover{border-color:var(--accent)}
+.mp-chip:focus-visible,.mp-tab:focus-visible,.mp-node:focus-visible,.mp-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mp-chip[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.mp-chip.all{padding:5px 14px}
+.mp-av{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;font-size:11px;font-weight:600;color:#fff;flex:none}
+.mp-chip .n{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.mp-tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line)}
+.mp-tab{border:0;background:none;font:inherit;font-weight:500;color:var(--muted);padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.mp-tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.mp-flow{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+.mp-canvas{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow-x:auto}
+.mp-canvas svg{display:block;width:100%;min-width:820px;height:auto}
+.mp-node{cursor:pointer}
+.mp-node rect.box{fill:var(--surface);stroke:var(--line);stroke-width:1.5;transition:stroke .15s}
+.mp-node:hover rect.box,.mp-node.sel rect.box{stroke-width:2.5}
+.mp-node.ext rect.box{stroke:var(--c-ti)}
+.mp-node text{font-family:var(--body);fill:var(--ink)}
+.mp-node .title{font-family:var(--display);font-weight:700;font-size:19px}
+.mp-node .meta{font-size:12.5px;fill:var(--muted)}
+.mp-node .ini{font-size:11px;font-weight:600;fill:#fff}
+.mp-node,.mp-edge{transition:opacity .2s}
+.mp-edge path{fill:none;stroke-width:2}
+.mp-edge text{font-family:var(--body);font-size:12px;fill:var(--muted)}
+.mp-edge rect{fill:var(--surface)}
+.mp-edge.hot path{stroke-width:3.2}
+.mp-edge.hot text{fill:var(--ink);font-weight:600}
+.mp .faded{opacity:var(--dim)}
+.mp-legend{display:flex;flex-wrap:wrap;gap:14px;padding:10px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);min-width:820px}
+.mp-legend span{display:inline-flex;align-items:center;gap:6px}
+.mp-legend i{display:inline-block;width:22px;height:0;border-top:2px solid var(--muted)}
+.mp-legend i.d{border-top-style:dashed}
+.mp-legend i.x{border-top-style:dotted;border-top-color:var(--c-ti)}
+.mp-panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px;position:sticky;top:12px}
+.mp-panel h2{font-family:var(--display);font-size:22px;margin:0;line-height:1.15}
+.mp-panel .kicker{display:flex;align-items:center;gap:8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.mp-panel .kicker .sw{width:10px;height:10px;border-radius:3px}
+.mp-panel p{margin:0;color:var(--muted);font-size:14px}
+.mp-acts{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.mp-acts li{border:1px solid var(--line);border-left:4px solid var(--area,var(--accent));border-radius:8px;padding:8px 10px;display:grid;gap:6px;position:relative}
+.mp-acts li.faded{opacity:.35}
+.mp-acts .t{font-weight:500;font-size:14px;padding-right:44px}
+.mp .who{display:flex;flex-wrap:wrap;gap:4px}
+.mp-tag{font-size:12px;border-radius:999px;padding:1px 8px;background:color-mix(in srgb,var(--area,var(--accent)) 14%,transparent);color:var(--ink)}
+.mp-tag.src{background:none;border:1px solid var(--line);color:var(--muted)}
+.mp-tag.me{background:var(--accent);color:#fff}
+.mp-conns{display:grid;gap:6px;font-size:13.5px}
+.mp-conns div{display:grid;grid-template-columns:16px minmax(0,1fr);gap:0 6px;align-items:baseline}
+.mp-conns .arrow{color:var(--muted);flex:none;width:16px}
+.mp-conns div .mp-ed{grid-column:2;margin:0 -7px;width:calc(100% + 14px);font-size:13.5px}
+.mp-btn{font:inherit;font-size:13px;border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer;justify-self:start}
+.mp-btn:hover{border-color:var(--accent)}
+.mp-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.mp-btn.primary:hover{filter:brightness(1.08)}
+.mp-btn:disabled{opacity:.45;cursor:not-allowed}
+.mp-tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow-x:auto}
+.mp table{border-collapse:collapse;width:100%;min-width:900px;font-size:14px;color:var(--ink)}
+.mp th,.mp td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+.mp thead th{font-size:12.5px;font-weight:600;color:var(--muted);position:sticky;top:0;background:var(--surface)}
+.mp thead th.p{text-align:center;width:76px}
+.mp td.c{text-align:center}
+.mp tr.mp-grp td{font-family:var(--display);font-weight:700;font-size:15px;padding-top:16px;border-bottom:2px solid var(--area)}
+.mp tr.mp-grp td .sw{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--area);margin-right:8px}
+.mp .dot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--area)}
+.mp tr.mp-row.faded{opacity:.28}
+.mp th.p.hl,.mp td.c.hl{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.mp .src-note{font-size:12px;color:var(--muted)}
+.mp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.mp-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:12px;align-content:start}
+.mp-card.faded{opacity:.3}
+.mp-card header{display:flex;align-items:center;gap:10px}
+.mp-card .mp-av{width:38px;height:38px;font-size:14px}
+.mp-card h3{margin:0;font-family:var(--display);font-size:18px;line-height:1.1;color:var(--ink)}
+.mp-card .areas{font-size:12.5px;color:var(--muted)}
+.mp-card ul{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:14px}
+.mp-card li{display:flex;gap:8px;align-items:baseline}
+.mp-card li i{width:8px;height:8px;border-radius:2px;flex:none;transform:translateY(-1px)}
+.mp-card .count{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.mp-fx{display:grid;gap:6px}
+.mp-fx .n{font-weight:500;letter-spacing:0;text-transform:none}
+.mp-clis{display:flex;flex-wrap:wrap;gap:6px}
+.mp-cli{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:2px 10px;cursor:pointer}
+.mp-cli:hover{border-color:var(--accent)}
+.mp-cli i{width:8px;height:8px;border-radius:50%;flex:none}
+.mp-cltb .mp-cli{background:none;border:0;padding:0;font-weight:500;font-size:14px}
+.mp-cltb .mp-tag{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.mp-cltb .mp-tag.me{background:var(--accent);color:#fff}
+.mp-seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:12px;background:var(--surface)}
+.mp-seg button{border:0;background:none;font:inherit;font-size:13px;color:var(--muted);padding:5px 14px;border-radius:999px;cursor:pointer}
+.mp-seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:600}
+.mp-notes{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;display:grid;gap:4px;max-width:90ch}
+@media (max-width:980px){.mp-flow{grid-template-columns:1fr}.mp-panel{position:static}}
+@media (prefers-reduced-motion:reduce){.mp *{transition:none!important}}
+.mp-ed{font:inherit;color:inherit;background:transparent;border:1px solid transparent;border-radius:6px;padding:2px 6px;margin:-3px -7px;width:calc(100% + 14px);resize:none;line-height:inherit;display:block;min-height:0}
+.mp-ed:hover:not(:disabled){border-color:var(--line)}
+.mp-ed:focus{outline:none;border-color:var(--accent);background:var(--bg)}
+.mp-ed:disabled{border-color:transparent;background:transparent;color:inherit;opacity:1;-webkit-text-fill-color:currentColor}
+.mp h2 .mp-ed,.mp input.mp-ed.h{font-family:var(--display);font-size:22px;font-weight:700}
+.mp-acts .t .mp-ed{font-weight:500;font-size:14px;overflow:hidden}
+.mp-tag.rm{display:inline-flex;align-items:center;gap:4px}
+.mp-tag.rm button{border:0;background:none;color:var(--muted);cursor:pointer;padding:0 0 0 2px;font:inherit;font-size:13px;line-height:1}
+.mp-tag.rm button:hover{color:var(--ink)}
+.mp-addp{font:inherit;font-size:12px;border:1px dashed var(--line);background:none;color:var(--muted);border-radius:999px;padding:1px 6px;cursor:pointer}
+.mp-addp:hover{border-color:var(--accent);color:var(--ink)}
+.mp-del{position:absolute;top:6px;right:6px;border:0;background:none;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 6px;border-radius:6px;opacity:0;transition:opacity .15s}
+.mp-acts li:hover .mp-del,.mp-del:focus-visible{opacity:1}
+.mp-del:hover{color:#c0262d;background:color-mix(in srgb,#c0262d 10%,transparent)}
+.mp-savebar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px}
+.mp-savebar.dirty{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.mp-savebar .msg{color:var(--muted);flex:1;min-width:200px}
+.mp-savebar.dirty .msg{color:var(--ink)}
+.mp-newp{display:inline-flex;gap:6px;align-items:center}
+.mp-newp input{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;width:150px}
+.mp-newp input:focus{outline:none;border-color:var(--accent)}
+.mp-hint{font-size:12.5px;color:var(--muted)}
+.mp-brand{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.mp-brand img{height:44px;width:auto;display:block}
+.mp-brand span{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;border-left:1px solid var(--line);padding-left:14px}
 </style>
 
 </head><body><div id="app"><div class="center"><div class="wiz"><div class="row"><b>Sistema Alra</b></div><p class="muted">Carregando…</p></div></div></div>
@@ -790,6 +927,7 @@ const ACOES = {
   ajuste:"Cliente pediu ajuste", registrou:"Aprovação registrada pela equipe", publicou:"Publicada", concluiu:"Tarefa concluída", iniciou:"Tarefa iniciada", reabriu:"Tarefa reaberta", ajuste_ok:"Ajuste concluído, de volta à revisão", data:"Data alterada", moveu:"Etapa alterada no quadro", notificou:"Notificação enviada"
 };
 const ICONS = {
+  processos:'<rect x="3" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="8.5" y="16" width="7" height="5" rx="1.5"/><path d="M6.5 8v3.5h11V8M12 11.5V16"/>',
   inicio:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   calendario:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
   pecas:'<rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/>',
@@ -837,8 +975,8 @@ function monthLabel(d){ const s = d.toLocaleDateString("pt-BR",{month:"long", ye
 const nowIso = () => new Date().toISOString();
 
 /* ================= estado + sincronização ================= */
-const COLS = ["unidades","pessoas","clientes","pecas","captacoes","materiais","acessos","feedbacks","pacotes","notifs","relatorios","arquivo","comercial","midiaContas","midiaCobs","alinhamentos"];
-const EMPTY = () => ({cfg:{}, unidades:[], pessoas:[], clientes:[], pecas:[], captacoes:[], materiais:[], acessos:[], feedbacks:[], pacotes:[], notifs:[], relatorios:[], arquivo:[], comercial:[], midiaContas:[], midiaCobs:[], alinhamentos:[]});
+const COLS = ["unidades","pessoas","clientes","pecas","captacoes","materiais","acessos","feedbacks","pacotes","notifs","relatorios","arquivo","comercial","midiaContas","midiaCobs","alinhamentos","mapa"];
+const EMPTY = () => ({cfg:{}, unidades:[], pessoas:[], clientes:[], pecas:[], captacoes:[], materiais:[], acessos:[], feedbacks:[], pacotes:[], notifs:[], relatorios:[], arquivo:[], comercial:[], midiaContas:[], midiaCobs:[], alinhamentos:[], mapa:[]});
 let S = EMPTY();
 let db = null, assets = null, mode = "loading";
 const cache = {}; COLS.concat(["cfg"]).forEach(c => cache[c] = {});
@@ -2075,10 +2213,260 @@ function pickHTML(){
 const syncTag = () => mode === "db" ? `<span class="syncdot">Dados compartilhados com a equipe</span>` : `<span class="syncdot local">Dados só neste navegador</span>`;
 
 /* ================= shell ================= */
+/* ================= Mapa de processos: áreas, atividades e responsáveis (moodboard interno) =================
+   Fluxo integrado, Matriz de responsabilidades, Por pessoa e Clientes por pessoa.
+   Edição só para Head e Diretoria; os demais consultam e filtram. Fica salvo na coleção "mapa" (documento "main"). */
+const MAPA_SEED = {"people": {"Mariana": {"c": "#7a4cc2"}, "João": {"c": "#5b3aa0"}, "Kevin": {"c": "#c2410c"}, "Pablo": {"c": "#0f8a6a"}, "Júlia": {"c": "#2f7d32"}, "Andressa": {"c": "#0e7490"}, "Jeremias": {"c": "#155e75"}, "Vitória": {"c": "#a16207"}, "Gabriela": {"c": "#7c5a10"}}, "areas": [{"id": "atend", "name": "Interação com Cliente", "color": "--c-atend", "desc": "Ponto de contato com o cliente. Reúne quem conversa com o cliente em cada frente.", "acts": [{"t": "Envio de planejamentos pelo WhatsApp e pauta de ajustes", "p": ["Mariana"], "src": "Planejamento"}, {"t": "Reuniões semanais com os clientes", "p": ["Kevin", "Pablo"], "src": "Tráfego"}, {"t": "Atendimento via WhatsApp e envio de verbas", "p": ["Kevin", "Pablo"], "src": "Tráfego"}, {"t": "Captação de conteúdos junto aos clientes", "p": ["Vitória", "Gabriela"], "src": "Audiovisual"}, {"t": "Mensagens aos clientes sobre publicações e acessos", "p": ["Pablo"], "src": "Social Media"}]}, {"id": "plan", "name": "Planejamento e Redação", "color": "--c-plan", "desc": "Define a estratégia de conteúdo e escreve os textos.", "acts": [{"t": "Planejamento macro inicial do cliente", "p": ["Mariana"]}, {"t": "Planejamento mensal de conteúdos", "p": ["João", "Mariana"]}, {"t": "Redação de posts", "p": ["João", "Mariana"]}, {"t": "Newsletters e releases", "p": ["João", "Mariana"]}, {"t": "Moodboard de planejamento", "p": ["João", "Mariana"]}, {"t": "Roteiros de vídeos", "p": ["João", "Mariana"]}, {"t": "Envio de planejamentos pelo WhatsApp e pauta de ajustes", "p": ["Mariana"], "client": true}]}, {"id": "traf", "name": "Tráfego", "color": "--c-traf", "desc": "Planeja e otimiza mídia paga e puxa demandas novas para a produção.", "acts": [{"t": "Planejamento macro inicial do cliente de tráfego", "p": ["Kevin", "Pablo"]}, {"t": "Otimizações de campanhas", "p": ["Kevin", "Pablo"]}, {"t": "Trakeamento de campanhas", "p": ["Kevin", "Pablo"]}, {"t": "Conduzir reuniões semanais com os clientes", "p": ["Kevin", "Pablo"], "client": true}, {"t": "Atendimento via WhatsApp", "p": ["Kevin", "Pablo"], "client": true}, {"t": "Pautar peças e demandas novas para Criação e Audiovisual", "p": ["Kevin", "Pablo"]}]}, {"id": "av", "name": "Audiovisual", "color": "--c-av", "desc": "Capta e edita fotos e vídeos.", "acts": [{"t": "Captação de conteúdos junto aos clientes", "p": ["Vitória", "Gabriela"], "client": true}, {"t": "Edição de vídeos", "p": ["Vitória", "Gabriela", "Júlia"]}, {"t": "Edição de fotos", "p": ["Vitória", "Gabriela", "Júlia"]}, {"t": "Participar da reunião de onboarding", "p": ["Gabriela"], "client": true}]}, {"id": "cria", "name": "Criação", "color": "--c-cria", "desc": "Identidade visual, peças gráficas e páginas.", "acts": [{"t": "Participar da reunião de onboarding", "p": ["Andressa", "Jeremias"], "client": true}, {"t": "Criação de peças gráficas digitais e off", "p": ["Andressa", "Jeremias"]}, {"t": "Criação de landing pages", "p": ["Andressa", "Jeremias"]}, {"t": "Moodboard visual de clientes", "p": ["Andressa", "Jeremias"]}, {"t": "Construção de marcas", "p": ["Andressa", "Jeremias"]}]}, {"id": "social", "name": "Social Media", "color": "--c-social", "desc": "Publica, mantém as plataformas e guarda os acessos.", "acts": [{"t": "Cadastrar cliente no sistema Alra", "p": ["Pablo"]}, {"t": "Fazer as publicações programadas", "p": ["Pablo"]}, {"t": "Salvar acessos no sistema", "p": ["Pablo", "Júlia"]}, {"t": "Atualizações nas plataformas quando necessário", "p": ["Pablo", "Júlia"]}, {"t": "Publicações no Google Meu Negócio", "p": ["Júlia"]}]}, {"id": "ti", "name": "TI · Parceiro externo", "color": "--c-ti", "ext": true, "desc": "Configurações técnicas feitas por um parceiro de fora da Alra: DNS, domínio, e-mail, hospedagem, certificado (SSL) e ajustes no site. Qualquer área que precise (landing page, pixel, e-mail do cliente) pede pelo Social Media, que abre a solicitação e acompanha até a entrega.", "acts": [{"t": "Abrir a solicitação ao parceiro: o que precisa, em qual domínio ou site, prazo e acessos necessários", "p": ["Pablo"]}, {"t": "Executar a configuração (DNS, domínio, e-mail, SSL, hospedagem)", "p": [], "ext": true}, {"t": "Testar a entrega, avisar a área que pediu e salvar os acessos no sistema", "p": ["Pablo", "Júlia"]}]}], "edges": [{"from": "cliente", "to": "atend", "label": "WhatsApp · reuniões", "p": ["Mariana", "Kevin", "Pablo"]}, {"from": "atend", "to": "plan", "label": "Mariana · planejamento e ajustes", "p": ["Mariana"]}, {"from": "atend", "to": "traf", "label": "Kevin · Pablo · reuniões e WhatsApp", "p": ["Kevin", "Pablo"]}, {"from": "plan", "to": "av", "label": "roteiros de vídeo", "p": ["João", "Mariana"]}, {"from": "plan", "to": "cria", "label": "moodboard de planejamento", "p": ["João", "Mariana"]}, {"from": "traf", "to": "cria", "label": "pauta peças", "p": ["Kevin", "Pablo"]}, {"from": "traf", "to": "av", "label": "pauta demandas", "p": ["Kevin", "Pablo"]}, {"from": "av", "to": "social", "label": "fotos e vídeos editados", "p": ["Vitória", "Gabriela"]}, {"from": "cria", "to": "social", "label": "peças prontas", "p": ["Andressa", "Jeremias"]}, {"from": "plan", "to": "social", "label": "posts e calendário", "p": ["João", "Mariana"]}, {"from": "social", "to": "atend", "label": "Pablo · mensagens ao cliente", "p": ["Pablo"]}, {"from": "atend", "to": "av", "label": "Vitória · Gabriela · captação", "p": ["Vitória", "Gabriela"]}, {"from": "social", "to": "ti", "label": "solicitação técnica", "p": ["Pablo"]}]};
+const MP_PALETTE = ["#d4007a","#7a4cc2","#c2410c","#0f8a6a","#c0267a","#b8860b","#2f7d32","#5b3aa0","#8e1d5c","#0e7490","#9a3412","#4d7c0f"];
+const MP_BOX = {
+  atend:{x:250,y:110,w:500,h:110}, plan:{x:110,y:290,w:310,h:120}, traf:{x:580,y:290,w:310,h:120},
+  av:{x:110,y:500,w:310,h:120}, cria:{x:580,y:500,w:310,h:120}, social:{x:345,y:700,w:310,h:110}, ti:{x:345,y:850,w:310,h:104}
+};
+const MP_GEO = {
+  "cliente-atend":{d:"M500,66 L500,110", lx:500, ly:88, client:true, color:"--c-atend"},
+  "atend-plan":{d:"M330,220 C330,255 265,255 265,290", lx:250, ly:252, client:true, color:"--c-plan"},
+  "atend-traf":{d:"M670,220 C670,255 735,255 735,290", lx:760, ly:252, client:true, color:"--c-traf"},
+  "plan-av":{d:"M200,410 L200,500", lx:200, ly:455, color:"--c-plan"},
+  "plan-cria":{d:"M380,410 C470,440 560,470 640,500", lx:400, ly:418, color:"--c-plan"},
+  "traf-cria":{d:"M800,410 L800,500", lx:800, ly:455, color:"--c-traf"},
+  "traf-av":{d:"M620,410 C530,440 440,470 360,500", lx:590, ly:422, color:"--c-traf"},
+  "av-social":{d:"M265,620 C265,670 400,660 420,700", lx:255, ly:668, color:"--c-av"},
+  "cria-social":{d:"M735,620 C735,670 600,660 580,700", lx:745, ly:668, color:"--c-cria"},
+  "plan-social":{d:"M110,350 L72,350 Q55,350 55,367 L55,763 Q55,780 72,780 L345,780", lx:55, ly:600, color:"--c-plan", vert:true},
+  "atend-av":{d:"M250,150 L102,150 Q85,150 85,167 L85,543 Q85,560 102,560 L110,560", lx:85, ly:425, client:true, color:"--c-av", vert:true},
+  "social-atend":{d:"M655,780 L928,780 Q945,780 945,763 L945,182 Q945,165 928,165 L750,165", lx:945, ly:470, client:true, color:"--c-social", vert:true},
+  "social-ti":{d:"M500,810 L500,850", lx:500, ly:830, ext:true, color:"--c-ti"}
+};
+const MP_FUNCOES = [["planejamento","Planejamento"],["producao","Criação"],["social","Social media"],["trafego","Tráfego"],["atendimento","Atendimento"]];
+const mpSt = () => { if (!ui.mp) { ui.mp = {draft:null, dirty:false, selArea:"atend", tab:"fluxo", cliView:"pessoa", sel:null, msg:""}; try { ui.mp.sel = localStorage.getItem("mapa-pessoa") || null; } catch(e) {} } return ui.mp; };
+const mpSaved = () => { const d = (S.mapa || []).find(x => x.id === "main"); return d && d.areas ? d : MAPA_SEED; };
+const mpCan = () => isHead();
+function mpData(){ const st = mpSt(); if (!st.dirty || !st.draft) st.draft = JSON.parse(JSON.stringify({people:mpSaved().people || {}, areas:mpSaved().areas || [], edges:mpSaved().edges || []})); if (st.sel && !st.draft.people[st.sel]) st.sel = null; if (!st.draft.areas.some(a => a.id === st.selArea)) st.selArea = "atend"; return st.draft; }
+const mpVar = v => { const el = document.querySelector(".mp") || document.documentElement; return getComputedStyle(el).getPropertyValue(v).trim() || "#888"; };
+const mpIni = n => String(n).normalize("NFD").replace(/[̀-ͯ]/g, "").trim().slice(0, 2).toUpperCase();
+const mpNorm = n => String(n || "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase().split(/\s+/)[0];
+const mpArea = (M, id) => M.areas.find(a => a.id === id);
+const mpAreaPeople = a => [...new Set(a.acts.flatMap(x => x.p))];
+const mpPersonActs = (M, n) => M.areas.filter(a => a.id !== "atend").flatMap(a => a.acts.filter(x => x.p.includes(n)).map(x => Object.assign({}, x, {area:a})));
+const mpPc = (M, n) => (M.people[n] || {c:"#888"}).c;
+const mpEdges = M => M.edges.map((e, i) => Object.assign({}, e, MP_GEO[e.from + "-" + e.to], {i})).filter(e => e.d);
+const mpNameOf = (M, id) => id === "cliente" ? "Cliente" : (mpArea(M, id) || {name:id}).name;
+/* pessoa do sistema que corresponde ao nome do mapa (primeiro nome, sem acento) */
+const mpPessoa = n => ativos().find(m => mpNorm(m.nome) === mpNorm(n));
+
+function mpStatsHTML(M){
+  const total = M.areas.filter(a => a.id !== "atend").reduce((s, a) => s + a.acts.length, 0);
+  const at = mpArea(M, "atend"), client = new Set(at ? at.acts.flatMap(x => x.p) : []).size, ext = M.areas.filter(a => a.ext).length;
+  return `<span class="mp-stat"><b>${M.areas.filter(a => !a.ext).length}</b> áreas</span>${ext ? `<span class="mp-stat"><b>${ext}</b> parceiro externo</span>` : ""}<span class="mp-stat"><b>${total}</b> atividades</span><span class="mp-stat"><b>${Object.keys(M.people).length}</b> responsáveis</span><span class="mp-stat"><b>${client}</b> pessoas falam direto com o cliente</span>`;
+}
+function mpChipsHTML(M){
+  const st = mpSt();
+  let h = `<button type="button" class="mp-chip all" aria-pressed="${!st.sel}" data-mpp="">Todos</button>`;
+  for (const n of Object.keys(M.people)) h += `<button type="button" class="mp-chip" aria-pressed="${st.sel === n}" data-mpp="${esc(n)}"><span class="mp-av" style="background:${mpPc(M, n)}">${esc(mpIni(n))}</span>${esc(n)} <span class="n">${mpPersonActs(M, n).length}</span></button>`;
+  if (mpCan()) h += `<span class="mp-newp"><input id="mp-newp" placeholder="Nova pessoa" aria-label="Nome da nova pessoa"><button type="button" class="mp-btn" data-mpa="addPerson">Adicionar</button></span>`;
+  return h;
+}
+function mpSvgHTML(M){
+  const st = mpSt(), sel = st.sel, E = mpEdges(M);
+  let h = `<defs>`;
+  for (const e of E) h += `<marker id="mp-ar-${e.from}-${e.to}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(${e.color})"/></marker>`;
+  h += `</defs>`;
+  for (const e of E) {
+    const on = sel ? e.p.includes(sel) : (e.from === st.selArea || e.to === st.selArea), fade = sel ? !on : false;
+    const w = Math.max(60, e.label.length * 6.4 + 14);
+    const label = e.vert
+      ? `<g transform="translate(${e.lx},${e.ly}) rotate(-90)"><rect x="${-w/2}" y="-10" width="${w}" height="20" rx="4"/><text text-anchor="middle" y="4">${esc(e.label)}</text></g>`
+      : `<rect x="${e.lx - w/2}" y="${e.ly - 10}" width="${w}" height="20" rx="4"/><text x="${e.lx}" y="${e.ly + 4}" text-anchor="middle">${esc(e.label)}</text>`;
+    h += `<g class="mp-edge ${on ? "hot" : ""} ${fade ? "faded" : ""}"><path d="${e.d}" style="stroke:var(${e.color})" ${e.client ? 'stroke-dasharray="6 5"' : e.ext ? 'stroke-dasharray="2 4"' : ""} marker-end="url(#mp-ar-${e.from}-${e.to})"/>${label}</g>`;
+  }
+  const at = mpArea(M, "atend"), cliFade = sel && !(at && at.acts.some(x => x.p.includes(sel)));
+  h += `<g class="${cliFade ? "faded" : ""}"><rect x="410" y="18" width="180" height="48" rx="24" style="fill:var(--ink)"/><text x="500" y="48" text-anchor="middle" style="font-family:var(--display);font-weight:700;font-size:18px;fill:var(--bg)">Cliente</text></g>`;
+  for (const a of M.areas) {
+    const b = MP_BOX[a.id]; if (!b) continue;
+    const ppl = mpAreaPeople(a), has_ = sel ? a.acts.some(x => x.p.includes(sel)) : true;
+    const mine = sel ? a.acts.filter(x => x.p.includes(sel)).length : a.acts.length;
+    const maxAv = Math.floor((b.w - 40) / 30);
+    let avs = "";
+    ppl.slice(0, maxAv).forEach((n, i) => {
+      const cx = b.x + 28 + i * 30, cy = b.y + b.h - 28;
+      const ring = sel === n ? `<circle cx="${cx}" cy="${cy}" r="16" fill="none" style="stroke:var(--ink)" stroke-width="2"/>` : "";
+      avs += `${ring}<circle cx="${cx}" cy="${cy}" r="13" fill="${mpPc(M, n)}"/><text class="ini" x="${cx}" y="${cy + 4}" text-anchor="middle">${esc(mpIni(n))}</text>`;
+    });
+    const title = a.name.length > 26 ? a.name.slice(0, 25) + "…" : a.name;
+    const meta = sel ? `${mine} de ${a.acts.length} atividades com ${sel}` : `${a.acts.length} atividades${a.ext ? " · externo" : ""}`;
+    h += `<g class="mp-node ${st.selArea === a.id ? "sel" : ""} ${has_ ? "" : "faded"} ${a.ext ? "ext" : ""}" data-mparea="${a.id}" tabindex="0" role="button" aria-label="${esc(a.name)}: ${a.acts.length} atividades. Responsáveis: ${esc(ppl.join(", "))}">
+      <rect class="box" x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="12" style="${st.selArea === a.id ? `stroke:var(${a.color})` : ""}" ${a.ext ? 'stroke-dasharray="7 5"' : ""}/>
+      <rect x="${b.x}" y="${b.y}" width="6" height="${b.h}" rx="3" style="fill:var(${a.color})"/>
+      <text class="title" x="${b.x + 22}" y="${b.y + 32}">${esc(title)}</text>
+      <text class="meta" x="${b.x + 22}" y="${b.y + 52}">${esc(meta)}</text>${avs}</g>`;
+  }
+  return h;
+}
+function mpPanelHTML(M){
+  const st = mpSt(), sel = st.sel, a = mpArea(M, st.selArea), can = mpCan(), dis = can ? "" : " disabled";
+  const ins = M.edges.map((e, i) => Object.assign({}, e, {i})).filter(e => e.to === a.id), outs = M.edges.map((e, i) => Object.assign({}, e, {i})).filter(e => e.from === a.id);
+  const connRow = (e, arrow, other) => `<div><span class="arrow">${arrow}</span><b>${esc(mpNameOf(M, other))}:</b><textarea class="mp-ed" rows="1" data-mpedge="${e.i}" aria-label="Descrição da conexão com ${esc(mpNameOf(M, other))}"${dis}>${esc(e.label)}</textarea></div>`;
+  const conn = [...ins.map(e => connRow(e, "←", e.from)), ...outs.map(e => connRow(e, "→", e.to))].join("");
+  const others = n => Object.keys(M.people).filter(p => !n.includes(p));
+  const lis = a.acts.map((x, i) => {
+    const f = sel && !x.p.includes(sel);
+    const opts = others(x.p).map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join("");
+    return `<li class="${f ? "faded" : ""}" style="--area:var(${a.color})">
+      <span class="t"><textarea class="mp-ed" rows="1" data-mpact="${i}" aria-label="Atividade"${dis}>${esc(x.t)}</textarea></span>
+      ${can ? `<button type="button" class="mp-del" data-mpa="delAct" data-i="${i}" aria-label="Remover atividade">Remover</button>` : ""}
+      <span class="who">${x.p.map(n => `<span class="mp-tag rm">${esc(n)}${can ? `<button type="button" data-mpa="rmp" data-i="${i}" data-n="${esc(n)}" aria-label="Tirar ${esc(n)} desta atividade">×</button>` : ""}</span>`).join("")}
+      ${can && opts ? `<select class="mp-addp" data-mpaddp="${i}" aria-label="Adicionar responsável"><option value="">+ responsável</option>${opts}</select>` : ""}
+      ${x.src ? `<span class="mp-tag src">vem de ${esc(x.src)}</span>` : ""}${x.client ? `<span class="mp-tag src">contato com cliente</span>` : ""}${x.ext ? `<span class="mp-tag src">feito pelo parceiro</span>` : ""}</span></li>`;
+  }).join("");
+  return `<div class="kicker" style="color:var(${a.color})"><span class="sw" style="background:var(${a.color})"></span>${a.ext ? "Parceiro externo" : "Área selecionada"}</div>
+    <h2><input class="mp-ed h" id="mp-ed-name" value="${esc(a.name)}" aria-label="Nome da área"${dis}></h2>
+    <p><textarea class="mp-ed" id="mp-ed-desc" rows="1" aria-label="Descrição da área"${dis}>${esc(a.desc)}</textarea></p>
+    <div><div class="mp-label" style="margin-bottom:6px">${a.ext ? "Quem pede e acompanha na Alra" : "Responsáveis"}</div><div class="who" style="display:flex;flex-wrap:wrap;gap:4px">${mpAreaPeople(a).map(n => `<span class="mp-tag">${esc(n)}</span>`).join("") || '<span class="mp-hint">Ninguém ainda</span>'}</div></div>
+    <div><div class="mp-label" style="margin-bottom:6px">Atividades</div><ul class="mp-acts">${lis}</ul></div>
+    ${can ? `<button type="button" class="mp-btn" data-mpa="addAct">+ Adicionar atividade</button>` : ""}
+    <div><div class="mp-label" style="margin-bottom:6px">Conexões</div><div class="mp-conns">${conn}</div></div>`;
+}
+function mpMatrixHTML(M){
+  const sel = mpSt().sel, names = Object.keys(M.people);
+  let h = `<thead><tr><th>Atividade</th>${names.map(n => `<th class="p ${sel === n ? "hl" : ""}">${esc(n)}</th>`).join("")}</tr></thead><tbody>`;
+  for (const a of M.areas) {
+    h += `<tr class="mp-grp" style="--area:var(${a.color})"><td colspan="${names.length + 1}"><span class="sw"></span>${esc(a.name)}</td></tr>`;
+    for (const x of a.acts) {
+      const f = sel && !x.p.includes(sel);
+      h += `<tr class="mp-row ${f ? "faded" : ""}" style="--area:var(${a.color})"><td>${esc(x.t)}${x.src ? ` <span class="src-note">· vem de ${esc(x.src)}</span>` : ""}${x.ext ? ` <span class="src-note">· feito pelo parceiro</span>` : ""}</td>${names.map(n => `<td class="c ${sel === n ? "hl" : ""}">${x.p.includes(n) ? `<span class="dot" title="${esc(n)}"></span>` : ""}</td>`).join("")}</tr>`;
+    }
+  }
+  return h + "</tbody>";
+}
+function mpCardsHTML(M){
+  const sel = mpSt().sel, can = mpCan(), at = mpArea(M, "atend");
+  let h = "";
+  for (const n of Object.keys(M.people)) {
+    const acts = mpPersonActs(M, n), areas = [...new Set(acts.map(x => x.area.name))];
+    const talks = at && at.acts.some(x => x.p.includes(n)), f = sel && sel !== n;
+    const rm = acts.length === 0 && can ? `<button type="button" class="mp-btn" data-mpa="rmPerson" data-n="${esc(n)}">Remover pessoa</button>` : "";
+    h += `<article class="mp-card ${f ? "faded" : ""}"><header><span class="mp-av" style="background:${mpPc(M, n)}">${esc(mpIni(n))}</span><div><h3>${esc(n)}</h3><div class="areas">${esc(areas.join(" · ") || "Sem atividades")}${talks ? " · atende cliente" : ""}</div></div><span class="count">${acts.length} atividades</span></header>
+      <ul>${acts.map(x => `<li><i style="background:var(${x.area.color})"></i><span>${esc(x.t)}</span></li>`).join("")}</ul>${rm}</article>`;
+  }
+  return h;
+}
+/* Clientes por pessoa: área (no mapa) · função na equipe do cliente · clientes */
+function mpClientesHTML(M){
+  const st = mpSt(), sel = st.sel, selM = sel ? mpPessoa(sel) : null;
+  const cls = S.clientes.filter(c => !c.excluido && inScope(c) && !/inativ|encerr|cancel|perdid/i.test(c.status || "")).sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  const nomeMapa = m => Object.keys(M.people).find(n => mpNorm(n) === mpNorm(m.nome));
+  const cor = m => { const n = nomeMapa(m); return n ? mpPc(M, n) : MP_PALETTE[Math.abs([...m.id].reduce((s, ch) => s + ch.charCodeAt(0), 0)) % MP_PALETTE.length]; };
+  const tog = `<div class="mp-seg" role="group" aria-label="Organizar por"><button type="button" data-mpcv="pessoa" aria-pressed="${st.cliView !== "cliente"}">Por pessoa</button><button type="button" data-mpcv="cliente" aria-pressed="${st.cliView === "cliente"}">Por cliente</button></div>`;
+  if (st.cliView === "cliente") {
+    const nome = id => { const m = person(id); return m && !m.excluido ? m : null; };
+    const rows = cls.map(c => { const sq = c.squad || {}, tem = selM && Object.values(sq).flat().includes(selM.id);
+      return `<tr class="mp-row ${selM && !tem ? "faded" : ""}"><td><button type="button" class="mp-cli" data-hub="${esc(c.id)}"><i style="background:${esc(c.cor || "#999")}"></i>${esc(c.nome)}</button></td>${MP_FUNCOES.map(([k]) => `<td>${(sq[k] || []).map(nome).filter(Boolean).map(m => `<span class="mp-tag${selM && selM.id === m.id ? " me" : ""}">${esc(m.nome.split(" ")[0])}</span>`).join(" ") || '<span class="mp-hint">—</span>'}</td>`).join("")}</tr>`; }).join("");
+    return `${tog}<div class="mp-tablewrap"><table class="mp-cltb"><thead><tr><th>Cliente</th>${MP_FUNCOES.map(([, l]) => `<th>${l}</th>`).join("")}</tr></thead><tbody>${rows || `<tr><td colspan="6" class="mp-hint">Nenhum cliente ativo.</td></tr>`}</tbody></table></div>`;
+  }
+  const ppl = ativos().map(m => ({m, fx:MP_FUNCOES.map(([k, l]) => [l, cls.filter(c => ((c.squad || {})[k] || []).includes(m.id))]).filter(x => x[1].length)}))
+    .map(x => Object.assign(x, {n:new Set(x.fx.flatMap(f => f[1].map(c => c.id))).size})).filter(x => x.n).sort((a, b) => b.n - a.n || a.m.nome.localeCompare(b.m.nome, "pt-BR"));
+  const cards = ppl.map(({m, fx, n}) => {
+    const nm = nomeMapa(m), areas = nm ? [...new Set(mpPersonActs(M, nm).map(x => x.area.name))] : [], f = selM && selM.id !== m.id;
+    return `<article class="mp-card ${f ? "faded" : ""}"><header><span class="mp-av" style="background:${cor(m)}">${esc(mpIni(m.nome))}</span><div><h3>${esc(m.nome)}</h3><div class="areas">${esc([m.cargo, areas.join(" · ")].filter(Boolean).join(" · ") || "Sem área no mapa")}</div></div><span class="count">${n} ${n === 1 ? "cliente" : "clientes"}</span></header>
+      ${fx.map(([l, list]) => `<div class="mp-fx"><div class="mp-label">${l} <span class="n">${list.length}</span></div><div class="mp-clis">${list.map(c => `<button type="button" class="mp-cli" data-hub="${esc(c.id)}"><i style="background:${esc(c.cor || "#999")}"></i>${esc(c.nome)}</button>`).join("")}</div></div>`).join("")}</article>`;
+  }).join("");
+  return `${tog}<p class="mp-hint" style="margin:0 0 12px">A equipe de cada cliente é definida no cadastro do cliente (4 · Equipe do cliente). Clique num cliente para abrir a ficha.</p><div class="mp-grid">${cards || `<p class="mp-hint">Nenhum cliente com equipe definida.</p>`}</div>`;
+}
+function mpBarMsg(){
+  const st = mpSt();
+  if (!mpCan()) return "Você pode consultar e filtrar o mapa. A edição é feita pela Head e pela Diretoria.";
+  if (st.msg) return st.msg;
+  if (st.dirty) return "Você tem alterações não salvas. Salve para que todos vejam a nova versão.";
+  return "Clique em qualquer texto do painel ao lado para editar. Use o filtro para adicionar responsáveis novos.";
+}
+function processosHTML(){
+  const M = mpData(), st = mpSt(), can = mpCan();
+  const tabs = [["fluxo","Fluxo integrado"],["matriz","Matriz de responsabilidades"],["pessoas","Por pessoa"],["clientes","Clientes por pessoa"]];
+  return `<div class="mp">
+  <header class="mp-head">
+    <div class="mp-brand">${LOGO_FULL(44)}<span>Mapa interno de processos</span></div>
+    <h1>Mapa de áreas, atividades e responsáveis</h1>
+    <p class="sub">Quem faz o quê em cada área e como o trabalho passa de uma área para outra até chegar ao cliente. Clique numa pessoa para filtrar, ou numa área do fluxo para ver${can ? " e editar" : ""} as atividades no painel ao lado.</p>
+    <div class="mp-stats" id="mp-stats">${mpStatsHTML(M)}</div>
+  </header>
+  <div class="mp-toolbar">
+    <span class="mp-label" id="mp-lbl-people">Filtrar por responsável</span>
+    <div class="mp-people" role="group" aria-labelledby="mp-lbl-people">${mpChipsHTML(M)}</div>
+  </div>
+  <div class="mp-savebar ${st.dirty ? "dirty" : ""}" id="mp-savebar"><span class="msg" id="mp-savemsg">${esc(mpBarMsg())}</span>${can ? `<button type="button" class="mp-btn" data-mpa="discard" ${st.dirty ? "" : "disabled"}>Descartar</button><button type="button" class="mp-btn primary" data-mpa="save" ${st.dirty ? "" : "disabled"}>Salvar alterações</button>` : ""}</div>
+  <div><div class="mp-tabs" role="tablist">${tabs.map(([k, l]) => `<button type="button" class="mp-tab" role="tab" aria-selected="${st.tab === k}" data-mptab="${k}">${l}</button>`).join("")}</div></div>
+  ${st.tab === "fluxo" ? `<section class="mp-flow">
+      <div class="mp-canvas">
+        <svg id="mp-svg" viewBox="0 0 1000 975" role="img" aria-label="Fluxo de trabalho entre as áreas">${mpSvgHTML(M)}</svg>
+        <div class="mp-legend">
+          <span><i></i> Entrega de trabalho entre áreas</span>
+          <span><i class="d"></i> Contato direto com o cliente</span>
+          <span><i class="x"></i> Solicitação a parceiro externo</span>
+          <span>Nas setas: quem faz a ponte e o que passa</span>
+        </div>
+      </div>
+      <aside class="mp-panel" id="mp-panel" aria-live="polite" style="--area:var(${mpArea(M, st.selArea).color})">${mpPanelHTML(M)}</aside>
+    </section>`
+  : st.tab === "matriz" ? `<section><div class="mp-tablewrap"><table class="mp-matrix" id="mp-matrix">${mpMatrixHTML(M)}</table></div></section>`
+  : st.tab === "pessoas" ? `<section><div class="mp-grid" id="mp-cards">${mpCardsHTML(M)}</div></section>`
+  : `<section>${mpClientesHTML(M)}</section>`}
+  <div class="mp-notes">
+    <span>A área de Atendimento reúne as atividades com contato direto com o cliente. Elas continuam aparecendo também na área de origem.</span>
+    <span><b>TI · Parceiro externo:</b> DNS, domínio, e-mail, hospedagem e ajustes técnicos no site não são feitos pela Alra. Quem precisar (Criação, Tráfego ou outra área) pede ao Social Media, que abre a solicitação com o parceiro e acompanha até a entrega.</span>
+  </div>
+</div>`;
+}
+function mpGrow(t){ t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }
+function mpAfter(){ document.querySelectorAll(".mp textarea.mp-ed").forEach(mpGrow); }
+function mpDirty(){ const st = mpSt(); st.dirty = true; st.msg = ""; const b = document.getElementById("mp-savebar"); if (b) { b.classList.add("dirty"); b.querySelectorAll("button").forEach(x => x.disabled = false); const m = document.getElementById("mp-savemsg"); if (m) m.textContent = mpBarMsg(); } }
+/* atualização leve enquanto digita: só o desenho, sem redesenhar o painel */
+function mpSoft(){ const M = mpData(), s = document.getElementById("mp-svg"), x = document.getElementById("mp-stats"); if (s) s.innerHTML = mpSvgHTML(M); if (x) x.innerHTML = mpStatsHTML(M); }
+function mpAddPerson(){
+  const inp = document.getElementById("mp-newp"); if (!inp) return; const M = mpData(), n = inp.value.trim();
+  if (!n || M.people[n]) { inp.focus(); return; }
+  M.people[n] = {c:MP_PALETTE[Object.keys(M.people).length % MP_PALETTE.length]}; mpDirty(); render();
+}
+document.addEventListener("click", ev => {
+  if (ui.view !== "processos" || !ev.target.closest) return;
+  const st = mpSt();
+  const p = ev.target.closest("[data-mpp]"); if (p) { st.sel = p.dataset.mpp || null; try { st.sel ? localStorage.setItem("mapa-pessoa", st.sel) : localStorage.removeItem("mapa-pessoa"); } catch(e) {} render(); return; }
+  const tb = ev.target.closest("[data-mptab]"); if (tb) { st.tab = tb.dataset.mptab; render(); return; }
+  const cv = ev.target.closest("[data-mpcv]"); if (cv) { st.cliView = cv.dataset.mpcv; render(); return; }
+  const nd = ev.target.closest("[data-mparea]"); if (nd) { st.selArea = nd.dataset.mparea; render(); return; }
+  const b = ev.target.closest("[data-mpa]"); if (!b) return;
+  const k = b.dataset.mpa, M = mpData(), a = mpArea(M, st.selArea);
+  if (k === "addPerson") { mpAddPerson(); return; }
+  if (!mpCan()) return;
+  if (k === "save") { const body = JSON.parse(JSON.stringify(M)); S.mapa = S.mapa || []; const cur = S.mapa.find(x => x.id === "main"); const doc = Object.assign({id:"main"}, body, {atualizadoEm:nowIso(), atualizadoPor:ui.me}); if (cur) Object.assign(cur, doc); else S.mapa.push(doc); save(); st.dirty = false; st.draft = null; st.msg = "Salvo. Todos que abrirem o mapa já veem esta versão."; render(); return; }
+  if (k === "discard") { st.dirty = false; st.draft = null; st.msg = ""; render(); return; }
+  if (k === "addAct") { a.acts.push({t:"Nova atividade", p:st.sel ? [st.sel] : []}); mpDirty(); render(); setTimeout(() => { const all = document.querySelectorAll(".mp [data-mpact]"), last = all[all.length - 1]; if (last) { last.focus(); last.select(); } }, 0); return; }
+  if (k === "delAct") { a.acts.splice(+b.dataset.i, 1); mpDirty(); render(); return; }
+  if (k === "rmp") { const x = a.acts[+b.dataset.i]; x.p = x.p.filter(n => n !== b.dataset.n); mpDirty(); render(); return; }
+  if (k === "rmPerson") { const n = b.dataset.n; delete M.people[n]; M.areas.forEach(ar => ar.acts.forEach(x => x.p = x.p.filter(q => q !== n))); M.edges.forEach(e => e.p = (e.p || []).filter(q => q !== n)); if (st.sel === n) st.sel = null; mpDirty(); render(); return; }
+});
+document.addEventListener("keydown", ev => {
+  if (ui.view !== "processos" || !ev.target.closest) return;
+  if (ev.target.id === "mp-newp" && ev.key === "Enter") { ev.preventDefault(); mpAddPerson(); return; }
+  const nd = ev.target.closest("[data-mparea]"); if (nd && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); mpSt().selArea = nd.dataset.mparea; render(); }
+});
+document.addEventListener("input", ev => {
+  const t = ev.target; if (ui.view !== "processos" || !t.closest || !t.closest(".mp") || !mpCan()) return;
+  const st = mpSt(), M = mpData(), a = mpArea(M, st.selArea);
+  if (t.id === "mp-ed-name") { a.name = t.value; mpDirty(); mpSoft(); }
+  else if (t.id === "mp-ed-desc") { a.desc = t.value; mpGrow(t); mpDirty(); }
+  else if (t.dataset.mpact !== undefined) { a.acts[+t.dataset.mpact].t = t.value; mpGrow(t); mpDirty(); mpSoft(); }
+  else if (t.dataset.mpedge !== undefined) { M.edges[+t.dataset.mpedge].label = t.value; mpGrow(t); mpDirty(); mpSoft(); }
+});
+document.addEventListener("change", ev => {
+  const t = ev.target; if (ui.view !== "processos" || !t.dataset || t.dataset.mpaddp === undefined || !mpCan() || !t.value) return;
+  const st = mpSt(), M = mpData(); mpArea(M, st.selArea).acts[+t.dataset.mpaddp].p.push(t.value); mpDirty(); render();
+});
+window.addEventListener("beforeunload", ev => { if (ui.mp && ui.mp.dirty && ui.view === "processos") { ev.preventDefault(); ev.returnValue = ""; } });
+
 function navItems(){
   const it = [["inicio","Início"],["equipePauta","Pauta da equipe"],["pecas","Kanban"],["calendario","Calendário"],["aprovacoes","Aprovações"]];
   if (timeAtLeast("B")) it.push(["publicacao","Publicações"]);
-  it.push(["captacoes","Captações"],["clientes","Clientes"]);
+  it.push(["captacoes","Captações"],["clientes","Clientes"],["processos","Mapa de processos"]);
   if (timeAtLeast("A")) it.push(["comercial","Comercial"]);
   if (midiaOk()) it.push(["midia","Financeiro de mídia"]);
   if (timeAtLeast("B")) it.push(["dashboards","Dashboards"]);
@@ -2106,7 +2494,7 @@ function render(){
   autoReports();
   const unread = S.notifs.filter(n => n.para === ui.me && !n.lida).length;
   const unreadRel = S.notifs.filter(n => n.para === ui.me && !n.lida && n.relId).length;
-  const V = {inicio:inicioHTML, equipePauta:equipePautaHTML, calendario:calendarioHTML, pecas:pecasHTML, aprovacoes:aprovacoesHTML, publicacao:publicacaoHTML, captacoes:captacoesHTML, clientes:clientesHTML, midia:midiaHTML, hub:hubHTML, dashboards:dashboardsHTML, config:configHTML, comercial:comercialHTML};
+  const V = {processos:processosHTML, inicio:inicioHTML, equipePauta:equipePautaHTML, calendario:calendarioHTML, pecas:pecasHTML, aprovacoes:aprovacoesHTML, publicacao:publicacaoHTML, captacoes:captacoesHTML, clientes:clientesHTML, midia:midiaHTML, hub:hubHTML, dashboards:dashboardsHTML, config:configHTML, comercial:comercialHTML};
   const opt = (v, l) => `<option value="${esc(v)}" ${ui.me === v ? "selected" : ""}>${esc(l)}</option>`;
   const sc = window.scrollY, keep = [...app.querySelectorAll(".board, .ap-scroll, .tbw, .epw")].map(el => [el.scrollLeft, el.scrollTop]);
   const sig = ui.view + "|" + (ui.openId || "") + "|" + (ui.modal || "") + "|" + (ui.hubId || ""); if (sig !== render.sig) { render.sig = sig; setTimeout(() => resync(), 0); }
@@ -2121,7 +2509,7 @@ function render(){
   window.scrollTo(0, sc);
   [...app.querySelectorAll(".board, .ap-scroll, .tbw, .epw")].forEach((el, i) => { if (keep[i]) { el.scrollLeft = keep[i][0]; el.scrollTop = keep[i][1]; } });
   apFit();
-  fillOverlay();
+  fillOverlay(); if (ui.view === "processos") mpAfter();
 }
 
 /* ================= comercial (prospecção, pipeline e campo) ================= */
